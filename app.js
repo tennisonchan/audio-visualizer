@@ -89,8 +89,12 @@ class App {
       this.stream = stream;
       let source = this.context.createMediaStreamSource(stream);
       let analyser = new AnalyserNode(this.context);
+      let noiseGate = new NoiseGateNode(this.context);
 
-      source.connect(analyser);
+      source.connect(noiseGate);
+      noiseGate.connect(analyser);
+      source.connect(this.context.destination);
+
       this.visualizer.connect(analyser);
 
       this.source = source;
