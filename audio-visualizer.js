@@ -1,26 +1,30 @@
-const WAVE = 0;
-const FREQUENCY = 1;
+const WAVE = 'wave';
+const FREQUENCY = 'frequency';
 
 window.requestAnimationFrame = window.requestAnimationFrame || window.mozRequestAnimationFrame || window.webkitRequestAnimationFrame || window.msRequestAnimationFrame;
 window.cancelAnimationFrame = window.cancelAnimationFrame || window.mozCancelAnimationFrame;
+
+const DEFAULT = {
+  backgroundColor: 'rgb(25, 25, 25)',
+  height: 300,
+  lineWidth: 2,
+  strokeStyle: 'rgb(0, 0, 0)',
+  type: FREQUENCY,
+  width: 300,
+};
 
 class AudioVisualizer {
   constructor(canvasId, options = {}) {
     this.animationFrameId = null;
     this.dataArray = null;
 
-    this.backgroundColor = options.backgroundColor || 'rgb(25, 25, 25)';
-    this.height = options.height || 300;
-    this.lineWidth = options.lineWidth || 2;
-    this.strokeStyle = options.strokeStyle || 'rgb(0, 0, 0)';
-    this.type = options.type === 'frequency' ? FREQUENCY : WAVE;
-    this.width = options.width || 300;
+    this.options = Object.assign({}, DEFAULT, options);
 
     let canvas = document.getElementById(canvasId);
     this.canvasCtx = canvas.getContext('2d');
 
-    canvas.width = this.width;
-    canvas.height = this.height;
+    canvas.width = this.options.width;
+    canvas.height = this.options.height;
   }
 
   initByteBuffer (frequencyBinCount) {
@@ -46,13 +50,13 @@ class AudioVisualizer {
   }
 
   setType(type) {
-    this.type = type === 'frequency' ? FREQUENCY : WAVE;
+    this.options.type = type === FREQUENCY ? FREQUENCY : WAVE;
   }
 
   render (analyser) {
     this.dataArray = this.initByteBuffer(analyser.frequencyBinCount);
 
-    switch(this.type) {
+    switch(this.options.type) {
       case WAVE:
         analyser.getFloatTimeDomainData(this.dataArray);
         this.renderWave(this.dataArray, this.canvasCtx);
@@ -67,7 +71,7 @@ class AudioVisualizer {
   renderWave(dataArray, canvasCtx) {
     let bufferLength = dataArray.length;
     let x = 0;
-    let { width, height, strokeStyle, lineWidth } = this;
+    let { width, height, strokeStyle, lineWidth, backgroundColor } = this.options;
 
     canvasCtx.strokeStyle = strokeStyle;
     canvasCtx.lineWidth = lineWidth;
@@ -78,8 +82,7 @@ class AudioVisualizer {
       if (i === 0) {
         x = 0;
         canvasCtx.clearRect(0, 0, width, height);
-
-        canvasCtx.fillStyle = this.backgroundColor;
+        canvasCtx.fillStyle = backgroundColor;
         canvasCtx.fillRect(0, 0, width, height);
         canvasCtx.beginPath();
 
@@ -95,7 +98,7 @@ class AudioVisualizer {
   }
 
   renderFrequency(dataArray, canvasCtx) {
-    let { width, height, backgroundColor} = this;
+    let { width, height, backgroundColor } = this.options;
     let bufferLength = dataArray.length;
 
     let barHeight;
