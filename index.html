@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<head>
+  <title>Audio Visualizer</title>
+</head>
+<body>
+  <div id="visualizer-mount">
+    <canvas id='visualizer'></canvas>
+    <div>
+      <input type="radio" id="wave"
+       name="analyser-type" value="wave" checked="true">
+      <label for="wave">Wave</label>
+
+      <input type="radio" id="frequency"
+       name="analyser-type" value="frequency">
+      <label for="frequency">Frequency</label>
+    </div>
+
+    <div>
+      <label for="input-check">Input</label>
+      <input id="input-check" type="checkbox" name="input-check" checked="true"/>
+    </div>
+  </div>
+</body>
+
+<script src="audio-visualizer.js"></script>
+<script src="app.js"></script>
+</html>
