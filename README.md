@@ -1,5 +1,5 @@
 # Audio Visualizer
-Visualizing the audio source
+A plug-and-play audio visualizer
 
 ## [DEMO](https://tennisonchan.github.io/audio-visualizer/)
 ### Frequency
@@ -16,7 +16,7 @@ const visualizer = new AudioVisualizer('canvasId', {
   type: 'wave',
   width: 700, height: 500,
   lineWidth: 2,
-  backgroundColor: 'rgb(255, 255, 255)'
+  backgroundColor: 'rgb(25, 25, 25)'
   strokeStyle: 'rgb(255, 255, 255)'
 });
 
