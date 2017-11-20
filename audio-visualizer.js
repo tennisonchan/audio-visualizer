@@ -108,7 +108,7 @@ class AudioVisualizer {
     for(let i = 0; i < bufferLength; i++) {
       barHeight = - dataArray[i] * 2;
 
-      canvasCtx.fillStyle = `rgb(${~~(255 - Math.pow(-barHeight / 10, 2))}, 50, 50)`;
+      canvasCtx.fillStyle = `rgb(${~~(255 - Math.pow(-barHeight / 15, 2))}, 50, 50)`;
       canvasCtx.fillRect(x, height, barWidth, barHeight - height / 2);
 
       x += barWidth + 1;
