@@ -9,7 +9,7 @@ class AudioVisualizer {
     this.animationFrameId = null;
     this.dataArray = null;
 
-    this.backgroundColor = options.backgroundColor || 'rgb(0, 0, 0)';
+    this.backgroundColor = options.backgroundColor || 'rgb(25, 25, 25)';
     this.height = options.height || 300;
     this.lineWidth = options.lineWidth || 2;
     this.strokeStyle = options.strokeStyle || 'rgb(0, 0, 0)';
