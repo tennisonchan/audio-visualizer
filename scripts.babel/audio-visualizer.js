@@ -118,3 +118,5 @@ class AudioVisualizer {
     }
   }
 }
+
+exports = module.exports = AudioVisualizer;

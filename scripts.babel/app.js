@@ -1,3 +1,6 @@
+import NoiseGateNode from 'noise-gate';
+import AudioVisualizer from './audio-visualizer.js';
+
 window.AudioContext = window.AudioContext || window.webkitAudioContext;
 
 const audioCtx = new AudioContext();

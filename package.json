@@ -1,0 +1,42 @@
+{
+  "name": "audio-visualizer",
+  "version": "1.0.0",
+  "description": "A plug-and-play audio visualizer",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tennisonchan/audio-visualizer.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/tennisonchan/audio-visualizer/issues"
+  },
+  "homepage": "https://github.com/tennisonchan/audio-visualizer#readme",
+  "dependencies": {
+    "noise-gate": "0.0.3"
+  },
+  "devDependencies": {
+    "babel-core": "^6.26.0",
+    "babel-preset-env": "^1.6.1",
+    "babelify": "^8.0.0"
+  },
+  "scripts": {
+    "build": "npm run build-browser",
+    "build-browser": "browserify scripts.babel/*.js > scripts/bundle.js -t babelify --presets env",
+    "watch": "watchify scripts.babel/*.js -o scripts/bundle.js -dv",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "browserify": {
+    "transform": [
+      [
+        "babelify",
+        {
+          "presets": [
+            "env"
+          ]
+        }
+      ]
+    ]
+  }
+}
