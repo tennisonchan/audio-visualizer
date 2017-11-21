@@ -103,4 +103,84 @@ class App {
   }
 }
 
+function onSuccess (stream) {
+  var mediaRecorder = new MediaRecorder(stream);
+
+  recordEl.onclick = function() {
+    mediaRecorder.start();
+    console.log(mediaRecorder.state);
+    console.log("recorder started");
+    recordEl.style.background = "red";
+
+    stopEl.disabled = false;
+    recordEl.disabled = true;
+  }
+
+  stopEl.onclick = function() {
+    mediaRecorder.stop();
+    console.log(mediaRecorder.state);
+    console.log("recorder stopped");
+    recordEl.style.background = "";
+    recordEl.style.color = "";
+    // mediaRecorder.requestData();
+
+    stopEl.disabled = true;
+    recordEl.disabled = false;
+  }
+
+  mediaRecorder.onstop = function(e) {
+    console.log("data available after MediaRecorder.stop() called.");
+
+    var clipName = prompt('Enter a name for your sound clip?','My unnamed clip');
+    console.log(clipName);
+    var clipContainer = document.createElement('article');
+    var clipLabel = document.createElement('p');
+    var audio = document.createElement('audio');
+    var deleteButton = document.createElement('button');
+
+    clipContainer.classList.add('clip');
+    audio.setAttribute('controls', '');
+    deleteButton.textContent = 'Delete';
+    deleteButton.className = 'delete';
+
+    if(clipName === null) {
+      clipLabel.textContent = 'My unnamed clip';
+    } else {
+      clipLabel.textContent = clipName;
+    }
+
+    clipContainer.appendChild(audio);
+    clipContainer.appendChild(clipLabel);
+    clipContainer.appendChild(deleteButton);
+    soundClipsEl.appendChild(clipContainer);
+
+    audio.controls = true;
+    var blob = new Blob(chunks, { 'type' : 'audio/ogg; codecs=opus' });
+    chunks = [];
+    var audioURL = window.URL.createObjectURL(blob);
+    audio.src = audioURL;
+    console.log("recorder stopped");
+
+    deleteButton.onclick = function(e) {
+      evtTgt = e.target;
+      evtTgt.parentNode.parentNode.removeChild(evtTgt.parentNode);
+    }
+
+    clipLabel.onclick = function() {
+      var existingName = clipLabel.textContent;
+      var newClipName = prompt('Enter a new name for your sound clip?');
+      if(newClipName === null) {
+        clipLabel.textContent = existingName;
+      } else {
+        clipLabel.textContent = newClipName;
+      }
+    }
+  }
+
+  mediaRecorder.ondataavailable = function(e) {
+    console.log('ondataavailable', e.data);
+    chunks.push(e.data);
+  }
+}
+
 new App(audioCtx);
