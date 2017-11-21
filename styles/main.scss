@@ -1,0 +1,60 @@
+$background: #000;
+$red: rgb(226, 10, 26);
+$white: #fff;
+$outer-size: 80px;
+$border-size: 5px;
+$bezier: cubic-bezier(.4, -.9, .9, 1);
+
+@mixin size($val) {
+  width: $val;
+  height: $val;
+}
+
+.record-button-wrap {
+  position: relative;
+  width: $outer-size;
+  height: $outer-size;
+  background-color: $background;
+  border-radius: 100%;
+}
+
+#record-button {
+  display: none;
+  position: relative;
+
+  &+label:before {
+    @include size(90%);
+    border-radius: 100%;
+    border: $border-size solid $white;
+    box-sizing: border-box;
+    content: '';
+    cursor: pointer;
+    display: block;
+    left: 50%;
+    position: absolute;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    transition: width 0.3s, height 0.3s, border-radius 0.3s, transform 0.3s;
+  }
+
+  &+label:after {
+    @include size(60%);
+    background: $red;
+    border-radius: 100%;
+    content: '';
+    cursor: pointer;
+    display: block;
+    left: 50%;
+    position: absolute;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    transition: width 0.3s, height 0.3s, border-radius 0.3s, transform 0.3s;
+  }
+
+  &:checked {
+    &+label:after {
+      @include size(48%);
+      border-radius: 6px;
+    }
+  }
+}

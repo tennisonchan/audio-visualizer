@@ -3,6 +3,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <head>
   <title>Audio Visualizer</title>
+  <link rel="stylesheet" href="styles/main.css">
 </head>
 <body>
   <div id="visualizer-mount">
@@ -20,7 +21,14 @@
     <div>
       <label for="input-check">Input</label>
       <input id="input-check" type="checkbox" name="input-check" checked="true"/>
+      <label for="noise-gate">Noise gate</label>
+      <input id="noise-gate" type="checkbox" name="noise-gate" checked="true"/>
     </div>
+  </div>
+
+  <div class="record-button-wrap">
+    <input id="record-button" type="checkbox" name="record-button">
+    <label for="record-button"></label>
   </div>
 </body>
 

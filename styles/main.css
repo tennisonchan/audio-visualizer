@@ -1,0 +1,43 @@
+.record-button-wrap {
+  position: relative;
+  width: 80px;
+  height: 80px;
+  background-color: #000;
+  border-radius: 100%; }
+
+#record-button {
+  display: none;
+  position: relative; }
+  #record-button + label:before {
+    width: 90%;
+    height: 90%;
+    border-radius: 100%;
+    border: 5px solid #fff;
+    box-sizing: border-box;
+    content: '';
+    cursor: pointer;
+    display: block;
+    left: 50%;
+    position: absolute;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    transition: width 0.3s, height 0.3s, border-radius 0.3s, transform 0.3s; }
+  #record-button + label:after {
+    width: 60%;
+    height: 60%;
+    background: #e20a1a;
+    border-radius: 100%;
+    content: '';
+    cursor: pointer;
+    display: block;
+    left: 50%;
+    position: absolute;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    transition: width 0.3s, height 0.3s, border-radius 0.3s, transform 0.3s; }
+  #record-button:checked + label:after {
+    width: 48%;
+    height: 48%;
+    border-radius: 6px; }
+
+/*# sourceMappingURL=main.css.map */

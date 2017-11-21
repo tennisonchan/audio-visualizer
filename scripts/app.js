@@ -24,6 +24,8 @@ class App {
     this.stream = null;
     this.source = null;
     this.context = audioCtx;
+    this.chunks = [];
+    this.applyNoiseGate = true;
 
     this.visualizer = new AudioVisualizer('visualizer', {
       type: 'wave',
@@ -32,6 +34,26 @@ class App {
     });
 
     this.getUserMedia();
+
+    document.getElementById('record-button').addEventListener('change', event => {
+      if (!this.stream || !this.stream.active) {
+        alert('Require to access to your microphone.');
+        event.target.checked = false;
+        return false;
+      }
+
+      if (!this.mediaRecorder ||this.mediaRecorder.stream.id !== this.stream.id) {
+        this.mediaRecorder = new MediaRecorder(this.stream);
+        this.mediaRecorder.onstop = this.onStop.bind(this);
+        this.mediaRecorder.ondataavailable = this.onDataAvailable.bind(this);
+      }
+
+      if (event.target.checked) {
+        this.mediaRecorder.start();
+      } else {
+        this.mediaRecorder.stop();
+      }
+    }, false);
 
     document.getElementsByName('analyser-type').forEach(input => {
       input.addEventListener('change', event => {
@@ -45,13 +67,33 @@ class App {
         this.getUserMedia();
       } else {
         this.stopUserMedia();
-        this.loadSound();
+        this.loadSound(URLs.organ);
       }
+    }, false);
+
+    document.getElementById('noise-gate').addEventListener('change', event => {
+      this.applyNoiseGate = !!event.target.checked;
     }, false);
   }
 
-  loadSound() {
-    loadSound(URLs.organ)
+  onStop (e) {
+    let blob = new Blob(this.chunks, { 'type' : 'audio/ogg; codecs=opus' });
+    let audioURL = window.URL.createObjectURL(blob);
+    this.chunks = [];
+
+    this.loadSound(audioURL, () => {
+      this.stopAudioSource();
+      this.getUserMedia();
+    });
+  }
+
+  onDataAvailable (e) {
+    console.log('ondataavailable', e.data);
+    this.chunks.push(e.data);
+  }
+
+  loadSound(url, onended) {
+    return loadSound(url)
     .then((event) => {
       let { response } = event.target;
 
@@ -59,15 +101,24 @@ class App {
         let source = new AudioBufferSourceNode(this.context, { buffer });
         let analyser = new AnalyserNode(this.context);
 
-        source.connect(analyser);
-        source.connect(this.context.destination);
+        if (this.applyNoiseGate) {
+          let noiseGate = new NoiseGateNode(this.context);
+
+          source.connect(noiseGate);
+          noiseGate.connect(analyser);
+        } else {
+          source.connect(analyser);
+        }
+
+        analyser.connect(this.context.destination);
         source.start();
+        source.onended = onended;
 
         this.visualizer.connect(analyser);
         this.source = source;
-      })
-      .catch(e => console.log(e));
-    });
+      });
+    })
+    .catch(e => console.log(e));
   }
 
   stopAudioSource() {
@@ -77,109 +128,36 @@ class App {
   }
 
   stopUserMedia() {
-    if (this.stream.active) {
-      let audioTracks = this.stream.getAudioTracks();
-      audioTracks.forEach(track => track.stop());
+    if (this.stream && this.stream.active) {
+      let tracks = this.stream.getTracks();
+      tracks.forEach(track => track.stop());
     }
   }
 
   getUserMedia() {
+    this.stopUserMedia();
     navigator.mediaDevices.getUserMedia({ audio: true })
     .then((stream) => {
       this.stream = stream;
       let source = this.context.createMediaStreamSource(stream);
       let analyser = new AnalyserNode(this.context);
-      let noiseGate = new NoiseGateNode(this.context);
 
-      source.connect(noiseGate);
-      noiseGate.connect(analyser);
-      source.connect(this.context.destination);
+      if (this.applyNoiseGate) {
+        let noiseGate = new NoiseGateNode(this.context);
+        source.connect(noiseGate);
+        noiseGate.connect(analyser);
+      } else {
+        source.connect(analyser);
+      }
+      analyser.connect(this.context.destination);
 
       this.visualizer.connect(analyser);
 
       this.source = source;
     })
-    .catch(e => console.log(e));
-  }
-}
-
-function onSuccess (stream) {
-  var mediaRecorder = new MediaRecorder(stream);
-
-  recordEl.onclick = function() {
-    mediaRecorder.start();
-    console.log(mediaRecorder.state);
-    console.log("recorder started");
-    recordEl.style.background = "red";
-
-    stopEl.disabled = false;
-    recordEl.disabled = true;
-  }
-
-  stopEl.onclick = function() {
-    mediaRecorder.stop();
-    console.log(mediaRecorder.state);
-    console.log("recorder stopped");
-    recordEl.style.background = "";
-    recordEl.style.color = "";
-    // mediaRecorder.requestData();
-
-    stopEl.disabled = true;
-    recordEl.disabled = false;
-  }
-
-  mediaRecorder.onstop = function(e) {
-    console.log("data available after MediaRecorder.stop() called.");
-
-    var clipName = prompt('Enter a name for your sound clip?','My unnamed clip');
-    console.log(clipName);
-    var clipContainer = document.createElement('article');
-    var clipLabel = document.createElement('p');
-    var audio = document.createElement('audio');
-    var deleteButton = document.createElement('button');
-
-    clipContainer.classList.add('clip');
-    audio.setAttribute('controls', '');
-    deleteButton.textContent = 'Delete';
-    deleteButton.className = 'delete';
-
-    if(clipName === null) {
-      clipLabel.textContent = 'My unnamed clip';
-    } else {
-      clipLabel.textContent = clipName;
-    }
-
-    clipContainer.appendChild(audio);
-    clipContainer.appendChild(clipLabel);
-    clipContainer.appendChild(deleteButton);
-    soundClipsEl.appendChild(clipContainer);
-
-    audio.controls = true;
-    var blob = new Blob(chunks, { 'type' : 'audio/ogg; codecs=opus' });
-    chunks = [];
-    var audioURL = window.URL.createObjectURL(blob);
-    audio.src = audioURL;
-    console.log("recorder stopped");
-
-    deleteButton.onclick = function(e) {
-      evtTgt = e.target;
-      evtTgt.parentNode.parentNode.removeChild(evtTgt.parentNode);
-    }
-
-    clipLabel.onclick = function() {
-      var existingName = clipLabel.textContent;
-      var newClipName = prompt('Enter a new name for your sound clip?');
-      if(newClipName === null) {
-        clipLabel.textContent = existingName;
-      } else {
-        clipLabel.textContent = newClipName;
-      }
-    }
-  }
-
-  mediaRecorder.ondataavailable = function(e) {
-    console.log('ondataavailable', e.data);
-    chunks.push(e.data);
+    .catch((e) => {
+      console.log(e);
+    });
   }
 }
 
