@@ -1,14 +1,12 @@
 const FILTER_PARAMS = ['type', 'frequency', 'gain', 'detune', 'Q'];
 const COMPRESSOR_PARAMS = ['threshold', 'knee', 'ratio', 'attack', 'release'];
-const DEFAULT_COMPRESSOR = {
+const DEFAULT_OPTIONS = {
   threshold: -50,
   knee: 40,
   ratio: 12,
   reduction: -20,
   attack: 0,
-  release: 0.25
-};
-const DEFAULT_FILTER = {
+  release: 0.25,
   Q: 8.30,
   frequency: 355,
   gain: 3.0,
@@ -17,11 +15,13 @@ const DEFAULT_FILTER = {
 
 class NoiseGateNode {
   constructor(audioCtx, options = {}) {
+    options = Object.assign({}, DEFAULT_OPTIONS, options);
+
     let compressorPramas = this.selectParams(options, COMPRESSOR_PARAMS);
     let filterPramas = this.selectParams(options, FILTER_PARAMS);
 
-    this.compressor = new DynamicsCompressorNode(audioCtx, Object.assign(DEFAULT_COMPRESSOR, compressorPramas));
-    this.filter = new BiquadFilterNode(audioCtx, Object.assign(DEFAULT_FILTER, filterPramas));
+    this.compressor = new DynamicsCompressorNode(audioCtx, compressorPramas);
+    this.filter = new BiquadFilterNode(audioCtx, filterPramas);
 
     this.compressor.connect(this.filter);
 
