@@ -1,9 +1,13 @@
 import NoiseGateNode from 'noise-gate';
 import AudioVisualizer from './audio-visualizer.js';
+import Wav from './wav.js';
 
 window.AudioContext = window.AudioContext || window.webkitAudioContext;
 
 const audioCtx = new AudioContext();
+
+// const wav = new Wav(audioCtx);
+
 const URLs = {
   blueyellow: 'audios/blueyellow.wav',
   techno: 'audios/techno.wav',
@@ -145,14 +149,20 @@ class App {
       let source = this.context.createMediaStreamSource(stream);
       let analyser = new AnalyserNode(this.context);
 
+      let wav = Wav(source);
+
       if (this.applyNoiseGate) {
         let noiseGate = new NoiseGateNode(this.context);
-        source.connect(noiseGate);
-        noiseGate.connect(analyser);
+        // source.connect(noiseGate);
+        // noiseGate.connect(analyser);
+        wav
+        .connect(noiseGate)
+        .connect(analyser)
       } else {
         source.connect(analyser);
       }
-      analyser.connect(this.context.destination);
+      wav.output();
+      // analyser.connect(this.context.destination);
 
       this.visualizer.connect(analyser);
 
